@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>CalcMaster Pro | Calculadora Avançada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(-45deg, #0a0f1e, #0f172a, #1e1b4b, #0b0f1f);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Partículas animadas */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            animation: floatParticle 8s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-20vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Container principal com efeito glassmorphism */
+        .container {
+            width: 95%;
+            max-width: 420px;
+            background: rgba(15, 25, 45, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 35px;
+            padding: 25px 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Relógio profissional */
+        .clock {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            font-family: 'Courier New', monospace;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Display profissional */
+        .display {
+            width: 100%;
+            height: 85px;
+            border: none;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            padding: 15px 20px;
+            text-align: right;
+            background: rgba(10, 15, 25, 0.9);
+            color: #0aff9e;
+            font-weight: 600;
+            letter-spacing: 2px;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(10, 255, 158, 0.3);
+            transition: all 0.2s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .display:focus {
+            outline: none;
+            border-color: #0aff9e;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 12px rgba(10, 255, 158, 0.5);
+        }
+
+        /* Grid de botões */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            padding: 18px 12px;
+            font-size: 1.3em;
+            font-weight: 600;
+            border: none;
+            border-radius: 18px;
+            background: rgba(30, 40, 60, 0.8);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        button:active {
+            transform: scale(0.94);
+            filter: brightness(0.9);
+        }
+
+        /* Efeito hover para desktop */
+        @media (hover: hover) {
+            button:hover {
+                background: rgba(50, 65, 95, 0.9);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+                border-color: rgba(10, 255, 158, 0.4);
+            }
+        }
+
+        /* Botões especiais */
+        .operator {
+            background: linear-gradient(135deg, #ff8c00, #ff6200);
+            border-color: rgba(255, 140, 0, 0.5);
+            color: white;
+            font-weight: 700;
+        }
+
+        .operator:active {
+            filter: brightness(0.85);
+        }
+
+        .equal {
+            background: linear-gradient(135deg, #00c853, #00a86b);
+            grid-column: span 2;
+            box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+            border-color: rgba(0, 200, 83, 0.6);
+            font-weight: 800;
+            font-size: 1.5em;
+        }
+
+        .clear {
+            background: linear-gradient(135deg, #ff3b30, #d32f2f);
+            color: white;
+            font-weight: 700;
+        }
+
+        .clear-all {
+            background: linear-gradient(135deg, #ff6b35, #e64a19);
+        }
+
+        .function-btn {
+            background: rgba(100, 70, 150, 0.8);
+            font-weight: 600;
+        }
+
+        /* Responsividade */
+        @media (max-width: 480px) {
+            .container {
+                padding: 18px 15px;
+            }
+            
+            button {
+                padding: 14px 10px;
+                font-size: 1.1em;
+            }
+            
+            .display {
+                font-size: 1.8em;
+                height: 75px;
+            }
+            
+            .clock {
+                font-size: 1em;
+            }
+        }
+
+        /* Animações de feedback */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pulse {
+            animation: pulse 0.2s ease;
+        }
+
+        /* Scroll oculto mas funcional */
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Partículas animadas -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- Relógio digital elegante -->
+        <div class="clock" id="clock">00:00:00</div>
+        
+        <!-- Display principal -->
+        <input type="text" id="display" class="display" readonly value="0" aria-label="Calculadora Display">
+        
+        <!-- Botões da calculadora -->
+        <div class="buttons">
+            <button onclick="clearAll()" class="clear-all function-btn">AC</button>
+            <button onclick="deleteLast()" class="function-btn">⌫</button>
+            <button onclick="append('%')" class="operator">%</button>
+            <button onclick="append('/')" class="operator">÷</button>
+            
+            <button onclick="append('7')">7</button>
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button onclick="append('*')" class="operator">×</button>
+            
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button onclick="append('-')" class="operator">-</button>
+            
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button onclick="append('+')" class="operator">+</button>
+            
+            <button onclick="append('0')">0</button>
+            <button onclick="append('.')">.</button>
+            <button onclick="calculate()" class="equal">=</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const display = document.getElementById('display');
+        let lastResult = null;
+        let lastExpression = '';
+
+        // Função para adicionar valor ao display com validação
+        function append(value) {
+            // Se o display está com "Erro" ou "Infinity", limpar antes
+            if (display.value === 'Erro' || display.value === 'Infinity' || display.value === 'NaN') {
+                clearAll();
+            }
+            
+            // Se o valor for operador e o display estiver vazio ou com 0, tratar
+            const operators = ['+', '-', '*', '/', '%'];
+            const currentVal = display.value;
+            
+            // Se o valor atual for apenas "0" e o novo valor não for ponto decimal
+            if (currentVal === '0' && value !== '.' && !operators.includes(value)) {
+                display.value = value;
+            } 
+            // Evitar operadores consecutivos
+            else if (operators.includes(value) && operators.includes(currentVal.slice(-1))) {
+                // Substituir o último operador pelo novo
+                display.value = currentVal.slice(0, -1) + value;
+            }
+            else {
+                display.value += value;
+            }
+            
+            // Adicionar efeito de clique
+            animateDisplay();
+        }
+
+        // Limpar tudo (AC)
+        function clearAll() {
+            display.value = '0';
+            lastResult = null;
+            lastExpression = '';
+            animateDisplay();
+        }
+
+        // Função para deletar último caractere
+        function deleteLast() {
+            if (display.value === 'Erro' || display.value === 'Infinity') {
+                clearAll();
+                return;
+            }
+            
+            if (display.value.length > 1) {
+                display.value = display.value.slice(0, -1);
+            } else {
+                display.value = '0';
+            }
+            animateDisplay();
+        }
+
+        // Calcular expressão com segurança e tratamento profissional
+        function calculate() {
+            let expression = display.value;
+            
+            // Tratamento de erros e validação
+            if (!expression || expression === 'Erro') {
+                display.value = 'Erro';
+                setTimeout(() => {
+                    if (display.value === 'Erro') clearAll();
+                }, 1500);
+                return;
+            }
+            
+            // Substituir símbolos visuais por operadores JS
+            let calcExpression = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '%');
+            
+            // Validação de expressão vazia
+            if (calcExpression.trim() === '') {
+                display.value = '0';
+                return;
+            }
+            
+            try {
+                // Calcular com segurança usando Function (alternativa ao eval com mais controle)
+                let result = safeEvaluate(calcExpression);
+                
+                // Validação do resultado
+                if (result === undefined || result === null || isNaN(result) || !isFinite(result)) {
+                    display.value = 'Erro';
+                    setTimeout(() => {
+                        if (display.value === 'Erro') clearAll();
+                    }, 1500);
+                    return;
+                }
+                
+                // Arredondamento para evitar decimais excessivos
+                if (typeof result === 'number') {
+                    // Limitar a 10 casas decimais para evitar números gigantes
+                    result = parseFloat(result.toFixed(10));
+                    // Remover trailing zeros desnecessários
+                    if (result.toString().includes('.')) {
+                        result = parseFloat(result.toString().replace(/\.?0+$/, ''));
+                    }
+                }
+                
+                lastResult = result;
+                lastExpression = expression;
+                display.value = result.toString();
+                
+                // Adicionar classe de animação
+                animateDisplay();
+                
+            } catch (error) {
+                console.error('Erro no cálculo:', error);
+                display.value = 'Erro';
+                setTimeout(() => {
+                    if (display.value === 'Erro') clearAll();
+                }, 1500);
+            }
+        }
+        
+        // Função segura para avaliação matemática
+        function safeEvaluate(expr) {
+            // Remover caracteres potencialmente perigosos
+            if (/[^0-9+\-*/%.()\s]/g.test(expr)) {
+                throw new Error('Caractere inválido');
+            }
+            
+            // Tratamento especial para porcentagem
+            // Encontrar padrões como "50%" ou "50%+20"
+            expr = expr.replace(/(\d+(?:\.\d+)?)%/g, (match, num) => {
+                return `(${parseFloat(num)} / 100)`;
+            });
+            
+            // Usar Function ao invés de eval para melhor segurança em escopo restrito
+            const fn = new Function('return (' + expr + ')');
+            return fn();
+        }
+        
+        // Animação do display
+        function animateDisplay() {
+            display.classList.add('animate-pulse');
+            setTimeout(() => {
+                display.classList.remove('animate-pulse');
+            }, 200);
+        }
+        
+        // Atualizar relógio com efeito e formatação profissional
+        function updateClock() {
+            const now = new Date();
+            let h = String(now.getHours()).padStart(2, '0');
+            let m = String(now.getMinutes()).padStart(2, '0');
+            let s = String(now.getSeconds()).padStart(2, '0');
+            
+            const clockElement = document.getElementById('clock');
+            const timeString = `${h}:${m}:${s}`;
+            
+            // Efeito de fade sutil no relógio
+            if (clockElement.textContent !== timeString) {
+                clockElement.style.opacity = '0.7';
+                setTimeout(() => {
+                    clockElement.textContent = timeString;
+                    setTimeout(() => {
+                        clockElement.style.opacity = '1';
+                    }, 50);
+                }, 50);
+            } else {
+                clockElement.textContent = timeString;
+            }
+        }
+        
+        // Criar partículas flutuantes animadas
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 45;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Tamanho aleatório entre 2px e 15px
+                const size = Math.random() * 13 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Posição inicial aleatória horizontal
+                particle.style.left = `${Math.random() * 100}%`;
+                
+                // Duração da animação entre 5 e 15 segundos
+                const duration = Math.random() * 10 + 6;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Delay aleatório
+                particle.style.animationDelay = `${Math.random() * 8}s`;
+                
+                // Opacidade aleatória
+                particle.style.opacity = Math.random() * 0.4 + 0.1;
+                
+                // Cor das partículas baseada no tema
+                const colors = ['rgba(10, 255, 158, 0.2)', 'rgba(100, 70, 200, 0.2)', 'rgba(255, 140, 0, 0.15)', 'rgba(255, 59, 48, 0.15)'];
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Suporte a teclado físico (profissional)
+        function handleKeyboard(e) {
+            const key = e.key;
+            const validKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', '*', '/', '%', 'Enter', 'Backspace', 'Escape', 'Delete'];
+            
+            if (validKeys.includes(key)) {
+                e.preventDefault();
+                
+                switch(key) {
+                    case 'Enter':
+                        calculate();
+                        break;
+                    case 'Backspace':
+                    case 'Delete':
+                        deleteLast();
+                        break;
+                    case 'Escape':
+                        clearAll();
+                        break;
+                    default:
+                        append(key);
+                }
+            }
+        }
+        
+        // Prevenir múltiplos pontos decimais
+        function validateDecimal() {
+            // Função adicional para validar ponto decimal duplicado no último número
+            const value = display.value;
+            const lastNumber = value.split(/[\+\-\*\/%]/).pop();
+            if (lastNumber.includes('.') && display.value.slice(-1) === '.') {
+                return false;
+            }
+            return true;
+        }
+        
+        // Sobrescrever append com validação de ponto decimal
+        const originalAppend = append;
+        window.append = function(value) {
+            if (value === '.') {
+                const currentVal = display.value;
+                const lastNumber = currentVal.split(/[\+\-\*\/%]/).pop();
+                if (lastNumber.includes('.')) {
+                    animateDisplay();
+                    return;
+                }
+                if (currentVal === '' || currentVal === '0') {
+                    display.value = '0.';
+                    animateDisplay();
+                    return;
+                }
+            }
+            originalAppend(value);
+        };
+        
+        // Inicializar
+        function init() {
+            createParticles();
+            updateClock();
+            setInterval(updateClock, 1000);
+            window.addEventListener('keydown', handleKeyboard);
+            
+            // Adicionar efeito de foco no display
+            display.addEventListener('focus', () => {
+                display.style.transform = 'scale(1.01)';
+            });
+            display.addEventListener('blur', () => {
+                display.style.transform = 'scale(1)';
+            });
+            
+            // Garantir que o display não fique vazio
+            if (display.value === '') {
+                display.value = '0';
+            }
+        }
+        
+        // Iniciar aplicação
+        init();
+        
+        // Reaplicar partículas em redimensionamento
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const container = document.getElementById('particles');
+                if (container) {
+                    container.innerHTML = '';
+                    createParticles();
+                }
+            }, 200);
+        });
+    </script>
+</body>
+</html>
